@@ -1,12 +1,11 @@
-import express, { Request, Response } from 'express'
+import express from 'express'
+import dotenv from 'dotenv'
+import aggregateRoutes from './routes/aggregateRoutes'
+dotenv.config()
 
 const app = express()
-const PORT = 3000
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Test')
-})
-
+const PORT = process.env.PORT
+app.use('/v1', aggregateRoutes)
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
+  console.log(`The server is running on http://localhost:${PORT}`)
 })
