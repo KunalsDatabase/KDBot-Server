@@ -3,25 +3,36 @@ import fetchDatafromSockets from '../services/socketService'
 import dotenv from 'dotenv'
 dotenv.config()
 const clusters = JSON.parse(process.env.CLUSTERS || '[]')
-async function respondWithData(msg:string,res:Response){
+async function respondWithData(msg:string){
   let result = {}
-  try{
-    for(let i=0;i<clusters.length;i++){
-      let newData = await fetchDatafromSockets(msg,clusters[i].host,clusters[i].port)
-      result= {...result,...JSON.parse(newData)}
+  for(let i=0;i<clusters.length;i++){
+    try{
+    let newData = await fetchDatafromSockets(msg,clusters[i].host,clusters[i].port)
+    result= {...result,...JSON.parse(newData)}
+    }
+    catch(err){
+      console.log(err)
+      continue
     }
   }
-  catch(err: any){
-    console.log(err)
-    return res.status(500).send(err)
-  }
-  res.json(result)
+  return result
+}
+let botData = {}
+let memoryData = {}
+function getDataEveryInterval(msg:string,data:Object,interval:number){
+  setInterval(async ()=>{
+    const newData = await respondWithData(msg);
+    Object.assign(data, newData)
+  },interval)
+}
+getDataEveryInterval('all_data',botData,5000)
+getDataEveryInterval('memory_usage',memoryData,5000)
+
+export const getAggregateBotInfo = (req: Request, res: Response) => {
+  return res.status(200).json(botData)
 }
 
-export const getAggregateBotInfo = async (req: Request, res: Response) => {
-  await respondWithData('all_data',res)
+export const getAggregateMemoryInfo =  (req: Request, res: Response) => {
+  return res.status(200).json(memoryData)
 }
 
-export const getAggregateMemoryInfo = async (req: Request, res: Response) => {
-  await respondWithData('memory_usage',res)
-}
