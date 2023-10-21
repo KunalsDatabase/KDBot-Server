@@ -1,0 +1,11 @@
+import { Request, Response } from 'express'
+import dotenv from 'dotenv'
+dotenv.config()
+
+export const callback = (req: Request, res: Response) => {
+  return res.status(200).json(req.query)
+}
+
+export const getUser =  (req: Request, res: Response) => {
+  return res.status(200)
+}
