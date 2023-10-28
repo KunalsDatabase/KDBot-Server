@@ -1,11 +1,27 @@
 import mysql from 'mysql2/promise'
+import {DataSource} from 'typeorm'
+import {UserSession} from './entities/UserSession'
+import { config } from 'dotenv'
+config()
 
-export const db = mysql.createPool({
+export const AppDataSource = new DataSource({
+  type: process.env.DB_TYPE as any,
   host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,  
+  port: Number(process.env.DB_PORT),
   database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  synchronize: true,
+  logging: true,
+  entities: [UserSession],
+  subscribers: [],
+  migrations: [],
 })
+
+export const initializeDatabase = async () => {
+AppDataSource.initialize()
+  .then(() => {
+      console.log("Database connection established")
+  })
+  .catch((error) => console.log(error))
+}

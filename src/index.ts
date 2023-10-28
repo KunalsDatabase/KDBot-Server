@@ -2,8 +2,10 @@ import express from 'express'
 import dotenv from 'dotenv'
 import aggregateRoutes from './routes/aggregateRoutes'
 import oauthRoutes from './routes/oauthRoutes'
+import { initializeDatabase } from './database/connection'
+import "reflect-metadata"
 dotenv.config()
-
+initializeDatabase()
 const app = express()
 const PORT = process.env.PORT
 app.use((req, res, next) => {
