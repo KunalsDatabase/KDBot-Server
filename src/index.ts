@@ -2,10 +2,10 @@ import express from 'express'
 import dotenv from 'dotenv'
 import aggregateRoutes from './routes/aggregateRoutes'
 import oauthRoutes from './routes/oauthRoutes'
-import { initializeDatabase } from './database/connection'
 import "reflect-metadata"
+import {AppDataSource} from './database/connection'
+import {initializeCache} from './services/sessionService'
 dotenv.config()
-initializeDatabase()
 const app = express()
 const PORT = process.env.PORT
 app.use((req, res, next) => {
@@ -16,6 +16,17 @@ app.use((req, res, next) => {
 })
 app.use('/v1', aggregateRoutes)
 app.use('/v1', oauthRoutes)
+
 app.listen(PORT, () => {
   console.log(`The server is running on http://localhost:${PORT}`)
 })
+
+AppDataSource.initialize().then(() => {
+  console.log('Database connection established')
+  initializeCache()
+
+}
+).catch((err) => {
+  console.log(err)
+})
+
