@@ -13,6 +13,9 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: true,
+  cache: {
+    duration: 60000
+  },
   entities: [UserSession],
   subscribers: [],
   migrations: [],
