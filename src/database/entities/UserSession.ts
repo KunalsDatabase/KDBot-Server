@@ -24,7 +24,7 @@ import{
     sessionExpiry!: Date
 
     @Column()
-    accesssTokenExpiry!: Date
+    accessTokenExpiry!: Date
   
     @CreateDateColumn()
     createdAt!: Date
