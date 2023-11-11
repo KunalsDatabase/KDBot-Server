@@ -52,7 +52,11 @@ export const createSession = async (session:tokenData):Promise<string|false> => 
 
 
 
-export const deleteSession = async (sessionId:string) => {
-    //return await sessionRepository.delete({ sessionId })
+export const deleteSession = async (sessionId:string,userId:string|null=null) => {
+    sessionCache.delete(sessionId)
+    return await sessionRepository.delete(userId?{userId:userId}:{sessionId:sessionId})
 }
-
+export const updateSession = async (session:UserSession) => {
+    sessionCache.set(session.sessionId, session)
+    return await sessionRepository.save(session)
+}
