@@ -1,15 +1,17 @@
 import { Request, Response } from 'express'
-import dotenv from 'dotenv'
+import { updateSession } from '../services/sessionService'
 import axios from 'axios'
-dotenv.config()
+
 
 export const getUser =  (req: Request, res: Response) => {
   axios.get('https://discord.com/api/oauth2/@me', {
     headers: {
-      Authorization: `Bearer ${req.accessToken}`
+      Authorization: `Bearer ${req.session.accessToken}`
     }
   })
   .then((response)=>{
+    req.session.userId = response.data.user.id
+    updateSession(req.session)
     return res.json(response.data.user)
   })
   .catch((err)=>{
