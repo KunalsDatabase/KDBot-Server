@@ -1,9 +1,13 @@
 import express from 'express'
-import {callback, getUser } from '../controllers/oauthController'
+import {sessionValidation} from '../middlewares/sessionValidation'
+import {callback,logout,logoutAll} from '../controllers/oauthController'
 
 const router = express.Router()
 
 router.get('/callback', callback)
-router.get('/getUser', getUser)
+router.use(sessionValidation)
+router.get('/logout', logout)
+router.get('/logoutAll', logoutAll)
+
 
 export default router
