@@ -1,3 +1,5 @@
+import { Request } from 'express'
+import { UserSession } from './database/entities/UserSession'
 export type tokenData = {
     access_token: string
     token_type: string
@@ -13,3 +15,10 @@ export type formData = {
     redirect_uri: string,
     scope:string
 }
+declare global {
+    namespace Express {
+      interface Request {
+        session: UserSession
+      }
+    }
+  }
