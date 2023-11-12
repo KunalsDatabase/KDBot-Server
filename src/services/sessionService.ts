@@ -35,12 +35,12 @@ export const createSession = async (session:tokenData):Promise<string|false> => 
     try {
         const userSession = new UserSession()
         userSession.accessToken = session.access_token
-        userSession.accessTokenExpiry = new Date(Date.now() + session.expires_in)
+        userSession.accessTokenExpiry = new Date(Date.now() + session.expires_in*1000)
         userSession.createdAt = new Date()
         userSession.lastLogin = new Date()
         userSession.sessionId = randomUUID()
         userSession.refreshToken = session.refresh_token
-        userSession.sessionExpiry =  new Date(Date.now() + session.expires_in*4)
+        userSession.sessionExpiry =  new Date(Date.now() + session.expires_in*4000)
         await sessionRepository.save(userSession)
         sessionCache.set(userSession.sessionId, userSession)
         return userSession.sessionId
@@ -53,10 +53,18 @@ export const createSession = async (session:tokenData):Promise<string|false> => 
 
 
 export const deleteSession = async (sessionId:string,userId:string|null=null) => {
-    sessionCache.delete(sessionId)
+    //if userid is provided, delete all sessions for that user
+    if(!userId)sessionCache.delete(sessionId)
+    else 
+    for (let [sessionId, session] of sessionCache) {
+        if (session.userId === userId) {
+            sessionCache.delete(sessionId)
+        }
+    }
     return await sessionRepository.delete(userId?{userId:userId}:{sessionId:sessionId})
 }
 export const updateSession = async (session:UserSession) => {
+//needs to check if session is not the same as the one in the cache
     sessionCache.set(session.sessionId, session)
     return await sessionRepository.save(session)
 }
