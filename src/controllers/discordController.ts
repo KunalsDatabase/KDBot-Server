@@ -10,7 +10,9 @@ export const getUser =  (req: Request, res: Response) => {
     }
   })
   .then((response)=>{
+    // attach user id to session if not already present, and update last login
     req.session.userId = response.data.user.id
+    req.session.lastLogin = new Date(Date.now())
     updateSession(req.session)
     return res.json(response.data.user)
   })
