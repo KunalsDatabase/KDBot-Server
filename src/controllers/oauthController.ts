@@ -43,10 +43,29 @@ export const logout = (req: Request, res: Response) => {
     res.redirect(process.env.APPLICATION_URI as string)
 
 }
-export const logoutAll = (req: Request, res: Response) => {
+export const logoutAll = async (req: Request, res: Response) => {
+    //delete all sessions for user and redirect to application, then revoke token from discord
   res.clearCookie('sessionId')
   deleteSession(req.cookies.sessionId,req.session.userId)
   res.redirect(process.env.APPLICATION_URI as string)
+  const tokenRevocationURL = process.env.TOKEN_URL+"/revoke" as string
+  const formdata = {
+    client_id: process.env.CLIENT_ID as string,
+    client_secret: process.env.CLIENT_SECRET as string,
+    token: req.session.accessToken
+  }
+
+  try {
+    const response = await axios.post(tokenRevocationURL, new URLSearchParams(formdata), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }) 
+  }
+  catch (error:any) {
+    console.error('Error revoking token:', error.response?.data || error.message)
+  }
+
 
 }
 
